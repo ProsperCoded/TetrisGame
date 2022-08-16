@@ -1,0 +1,9 @@
+.myBody{
+  /* margin: 20%; */
+  margin:auto 10%;
+  padding-bottom:50%;
+  border:solid rgb(255, 127, 127) 5px;
+}
+body{
+  background-color: rgb(49, 37, 22);
+}
