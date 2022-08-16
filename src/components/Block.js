@@ -1,5 +1,5 @@
-import React from 'react'
-import {axis_props} from "../App.js"
+import React, { Component, useState } from 'react'
+import { axis_props } from '../App.js'
 
 let BlockDefault_styles = {
   padding: '5px',
@@ -10,11 +10,18 @@ let BlockDefault_styles = {
 }
 const BLOCK_INCREMENT = 10
 
-function Block (style) {
-  return <div key={Math.random()} style={style}></div>
+class Block {
+  constructor (style) {
+    this.style = style
+  }
+
+  component () {
+    return <div key={Math.random()} style={this.style}></div>
+  }
 }
-class CreateBlockComponent extends React.Component {
-  constructor ({ x_axis, y_axis, style, positions,run }) {
+
+class CreateBlockStructure extends React.Component {
+  constructor (props) {
     super()
     const Blocks = [
       [0, 0, 0, 0],
@@ -23,30 +30,34 @@ class CreateBlockComponent extends React.Component {
       [0, 0, 0, 0]
     ]
 
-    this.style = { ...BlockDefault_styles, ...style }
+    this.style = { ...BlockDefault_styles, ...props.style }
 
-    positions.forEach(index => {
-      Blocks[index[0]][index[1]] = Block
+    props.positions.forEach(index => {
+      Blocks[index[0]][index[1]] = new Block()
     })
+    this.props = props
     this.structure = Blocks
 
-    this.positions = positions
+    this.positions = props.positions
     this.state = {
-      x_axis: x_axis,
-      y_axis: y_axis
+      x_axis: props.x_axis,
+      y_axis: props.y_axis,
+      
     }
-    console.log("this is run", run)
-    if (run){
-      this.timer = setInterval(this.stepDown,500)
+    this.run = props.run
+    if (this.run) {
+      this.timer = setInterval(this.stepDown, 5000)
     }
+
   }
   stepDown = () => {
-    if (this.state.y_axis >= axis_props.Max_y_axis){
+
+    if ((this.state.y_axis >= axis_props.Max_y_axis)||(this.props.shouldRun(this))){
       clearInterval(this.timer)
       return
     }
-    this.setState((prevState) => {
-      return {y_axis: prevState.y_axis + BLOCK_INCREMENT}
+    this.setState(prevState => {
+      return { y_axis: prevState.y_axis + BLOCK_INCREMENT }
     })
   }
   resetValues () {
@@ -65,7 +76,8 @@ class CreateBlockComponent extends React.Component {
         top: this.state.y_axis + this.y_increment,
         left: this.state.x_axis + this.x_increment
       }
-      block_component = block(style)
+      block.style = style
+      block_component = block.component()
     }
     this.x_increment += BLOCK_INCREMENT
     return block_component
@@ -89,10 +101,11 @@ class CreateBlockComponent extends React.Component {
         {this.structure[3].map(block => {
           return this.applyBlock(block)
         })}
+        {this.props.addBlockStructure(this,this.props.id)}
       </div>
     )
   }
 }
-export default CreateBlockComponent
+export default CreateBlockStructure
 
 export { BlockDefault_styles, BLOCK_INCREMENT }
