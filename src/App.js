@@ -99,13 +99,14 @@ class App extends React.Component {
   }
   newBlock = () => {
     let positions = generateBlockPositions()
-    const blockStructure = { positions: positions, active: false }
+    const blockData = { positions: positions, active: false }
     // const blockStructure = (
     //
     // )
     this.setState(prevState => {
-      prevState.allBlocks.push(blockStructure)
-      return { allBlocks: prevState.allBlocks }
+      let new_state = [...prevState.allBlocks]
+      new_state.push(blockData)
+      return { allBlocks: new_state }
     })
   }
   shouldRun = check_blockStructure => {
@@ -156,6 +157,7 @@ class App extends React.Component {
       })
     })
   }
+  
   resetValues = () => {
     this.numberOfBlocks = 0
   }
@@ -163,13 +165,13 @@ class App extends React.Component {
     this.resetValues()
     return (
       <div className='myBody'>
-        {this.state.allBlocks.map((blockStructure, index) => {
+        {this.state.allBlocks.map((blockData, index) => {
           this.numberOfBlock++
           return (
             <CreateBlockStructure
               x_axis={axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3)}
               y_axis={axis_props.Min_y_axis + BLOCK_INCREMENT}
-              positions={blockStructure.positions}
+              positions={blockData.positions}
               key={index}
               id={index}
               run={true}
