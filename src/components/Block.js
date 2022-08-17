@@ -13,10 +13,11 @@ const BLOCK_INCREMENT = 10
 class Block {
   constructor (style) {
     this.style = style
+    
   }
 
   component () {
-    return <div key={Math.random()} style={this.style}></div>
+    return <div style={this.style}></div>
   }
 }
 
