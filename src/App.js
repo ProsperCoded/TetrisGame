@@ -95,16 +95,14 @@ class App extends React.Component {
   }
   moveRight = () => {
     this.setState(prevState => {
-      
       const old_state = Object.assign([], prevState.allBlocks)
       const new_state = old_state.map((blockData, index) => {
         if (blockData.active) {
           blockData.x_axis += BLOCK_INCREMENT
 
-          if (!(index > this.state.allBlockClass.length-1)) {
-              let newBlockClasses = this.state.allBlockClass
-              newBlockClasses[index].moveRight(BLOCK_INCREMENT)
-              return { allBlockClass: newBlockClasses }
+          if (!(index > this.state.allBlockClass.length - 1)) {
+            let newBlockClasses = this.state.allBlockClass
+            newBlockClasses[index].moveBlockRight(BLOCK_INCREMENT)
           }
         }
         return blockData
@@ -131,21 +129,19 @@ class App extends React.Component {
   // }
   moveLeft = () => {
     this.setState(prevState => {
-
       const old_state = Object.assign([], prevState.allBlocks)
+      let newBlocksClass = prevState.state.allBlockClass
       const new_state = old_state.map((blockData, index) => {
         if (blockData.active) {
           blockData.x_axis -= BLOCK_INCREMENT
-          
-          if (!(index > this.state.allBlockClass.length-1)) {
-              let newBlockClasses = this.state.allBlockClass
-              newBlockClasses[index].moveLeft(BLOCK_INCREMENT)
-              return { allBlockClass: newBlockClasses }
+
+          if (!(index > this.state.allBlockClass.length - 1)) {
+            newBlocksClass[index].moveBlockLeft(BLOCK_INCREMENT)
           }
         }
         return blockData
       })
-      return { allBlocks: new_state }
+      return { allBlocks: new_state, allBlockClass: newBlocksClass }
     })
   }
   userInput = e => {
@@ -184,7 +180,6 @@ class App extends React.Component {
       new_state.push(blockData)
       return { allBlocks: new_state }
     })
-
   }
   shouldRun = check_blockStructure => {
     // Check if a particular block(check_blockStructure) is in contact with any other block

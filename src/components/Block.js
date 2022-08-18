@@ -70,12 +70,12 @@ class CreateBlockStructure extends React.Component {
     this.x_increment = 0
     this.y_increment += BLOCK_INCREMENT
   }
-  moveLeft(by){
+  moveBlockLeft(by){
     this.setState((prevState)=> {
       return {x_axis: prevState.x_axis - by}
     })
   }
-  moveRight(by){
+  moveBlockRight(by){
     this.setState((prevState)=> {
       return {x_axis: prevState.x_axis + by}
     })
