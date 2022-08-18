@@ -99,13 +99,23 @@ class App extends React.Component {
   }
   newBlock = () => {
     let positions = generateBlockPositions()
-    const blockStructure = { positions: positions, active: false }
-    // const blockStructure = (
-    //
-    // )
+    // const blockStructure = { positions: positions, active: false }
+    const blockStructure = (
+      <CreateBlockStructure
+        x_axis={axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3)}
+        y_axis={axis_props.Min_y_axis + BLOCK_INCREMENT}
+        positions={positions}
+        key={this.numberOfBlocks}
+        id={this.numberOfBlocks}
+        run={true}
+        shouldRun={this.shouldRun}
+        addBlockStructure={this.addBlockStructure}
+      />
+    )
     this.setState(prevState => {
-      prevState.allBlocks.push(blockStructure)
-      return { allBlocks: prevState.allBlocks }
+      let new_state = [...prevState.allBlocks]
+      new_state.push(blockData)
+      return { allBlocks: new_state }
     })
   }
   shouldRun = check_blockStructure => {
@@ -156,27 +166,12 @@ class App extends React.Component {
       })
     })
   }
-  resetValues = () => {
-    this.numberOfBlocks = 0
-  }
   render () {
     this.resetValues()
     return (
       <div className='myBody'>
-        {this.state.allBlocks.map((blockStructure, index) => {
-          this.numberOfBlock++
-          return (
-            <CreateBlockStructure
-              x_axis={axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3)}
-              y_axis={axis_props.Min_y_axis + BLOCK_INCREMENT}
-              positions={blockStructure.positions}
-              key={index}
-              id={index}
-              run={true}
-              shouldRun={this.shouldRun}
-              addBlockStructure={this.addBlockStructure}
-            />
-          )
+        {this.state.allBlocks.map(blockStructure => {
+          return blockStructure
         })}
       </div>
     )

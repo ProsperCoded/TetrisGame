@@ -11,13 +11,14 @@ let BlockDefault_styles = {
 const BLOCK_INCREMENT = 10
 
 class Block {
-  constructor (style) {
-    this.style = style
+  constructor (index) {
+    this.style = undefined
+    this.index = parseInt(index)
     
   }
 
   component () {
-    return <div style={this.style}></div>
+    return <div key={this.index} style={this.style}></div>
   }
 }
 
@@ -34,7 +35,7 @@ class CreateBlockStructure extends React.Component {
     this.style = { ...BlockDefault_styles, ...props.style }
 
     props.positions.forEach(index => {
-      Blocks[index[0]][index[1]] = new Block()
+      Blocks[index[0]][index[1]] = new Block(`${index[0]}${index[1]}`)
     })
     this.props = props
     this.structure = Blocks
@@ -47,7 +48,7 @@ class CreateBlockStructure extends React.Component {
     }
     this.run = props.run
     if (this.run) {
-      this.timer = setInterval(this.stepDown, 5000)
+      this.timer = setInterval(this.stepDown, 500)
     }
 
   }
