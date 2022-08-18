@@ -6,9 +6,15 @@ import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+<<<<<<< HEAD
   <StrictMode>
     <App />
   </StrictMode> 
+=======
+  
+    <App />
+  
+>>>>>>> testapp
 );
 
 
