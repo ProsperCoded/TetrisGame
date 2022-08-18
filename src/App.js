@@ -90,7 +90,81 @@ class App extends React.Component {
       allBlockClass: []
     }
     setInterval(this.newBlock, 5000)
+
+    document.addEventListener('keyup', this.userInput)
   }
+  moveRight = () => {
+    this.setState(prevState => {
+      
+      const old_state = Object.assign([], prevState.allBlocks)
+      const new_state = old_state.map((blockData, index) => {
+        if (blockData.active) {
+          blockData.x_axis += BLOCK_INCREMENT
+
+          if (!(index > this.state.allBlockClass.length-1)) {
+              let newBlockClasses = this.state.allBlockClass
+              newBlockClasses[index].moveRight(BLOCK_INCREMENT)
+              return { allBlockClass: newBlockClasses }
+          }
+        }
+        return blockData
+      })
+      return { allBlocks: new_state }
+    })
+  }
+
+  // shouldComponentUpdate (nextProps, nextState) {
+  //   if (this.state.allBlocks.length !== nextState.allBlocks.length) return true
+  //   return nextState.allBlocks.some((blockData, index) => {
+  //     if (
+  //       !(
+  //         this.state.allBlocks[index].x_axis === blockData.x_axis &&
+  //         this.state.allBlocks[index].y_axis === blockData.y_axis
+  //       )
+  //     ) {
+  //       console.log('previous state::', nextState)
+  //       console.log('new state::', this.state)
+  //       return true
+  //     }
+  //     return false
+  //   })
+  // }
+  moveLeft = () => {
+    this.setState(prevState => {
+
+      const old_state = Object.assign([], prevState.allBlocks)
+      const new_state = old_state.map((blockData, index) => {
+        if (blockData.active) {
+          blockData.x_axis -= BLOCK_INCREMENT
+          
+          if (!(index > this.state.allBlockClass.length-1)) {
+              let newBlockClasses = this.state.allBlockClass
+              newBlockClasses[index].moveLeft(BLOCK_INCREMENT)
+              return { allBlockClass: newBlockClasses }
+          }
+        }
+        return blockData
+      })
+      return { allBlocks: new_state }
+    })
+  }
+  userInput = e => {
+    console.log('you pressed', e)
+    switch (e.key) {
+      case 'ArrowLeft': {
+        this.moveLeft()
+        break
+      }
+      case 'ArrowRight': {
+        this.moveRight()
+        break
+      }
+      default: {
+        console.log('either left or right key')
+      }
+    }
+  }
+
   addBlockStructure = (blockStructure, id) => {
     this.setState(prevState => {
       prevState.allBlockClass[id] = blockStructure
@@ -99,15 +173,18 @@ class App extends React.Component {
   }
   newBlock = () => {
     let positions = generateBlockPositions()
-    const blockData = { positions: positions, active: false }
-    // const blockStructure = (
-    //
-    // )
+    const blockData = {
+      positions: positions,
+      active: true,
+      x_axis: axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3),
+      y_axis: axis_props.Min_y_axis + BLOCK_INCREMENT
+    }
     this.setState(prevState => {
       let new_state = [...prevState.allBlocks]
       new_state.push(blockData)
       return { allBlocks: new_state }
     })
+
   }
   shouldRun = check_blockStructure => {
     // Check if a particular block(check_blockStructure) is in contact with any other block
@@ -157,7 +234,14 @@ class App extends React.Component {
       })
     })
   }
-  
+  inActivate = blockStructure => {
+    const index = blockStructure.props.id
+    this.setState(prevState => {
+      let new_state = prevState
+      new_state[index].active = false
+      return { allBlocks: new_state }
+    })
+  }
   resetValues = () => {
     this.numberOfBlocks = 0
   }
@@ -169,17 +253,20 @@ class App extends React.Component {
           this.numberOfBlock++
           return (
             <CreateBlockStructure
-              x_axis={axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3)}
-              y_axis={axis_props.Min_y_axis + BLOCK_INCREMENT}
+              x_axis={blockData.x_axis}
+              y_axis={blockData.y_axis}
               positions={blockData.positions}
               key={index}
               id={index}
-              run={true}
+              run={blockData.active}
               shouldRun={this.shouldRun}
+              inActivate={this.inActivate}
               addBlockStructure={this.addBlockStructure}
             />
           )
         })}
+        <button onClick={this.moveLeft}>Move left</button>
+        <button onClick={this.moveLeft}>Move Right</button>
       </div>
     )
   }
