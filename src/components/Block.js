@@ -1,6 +1,5 @@
-import React, { Component, useState } from 'react'
+import React from "react"
 import { axis_props } from '../App.js'
-
 let BlockDefault_styles = {
   padding: '5px',
   backgroundColor: 'black',
@@ -14,25 +13,26 @@ class Block {
   constructor (index) {
     this.style = undefined
     this.index = parseInt(index)
-    
   }
 
   component () {
     return <div key={this.index} style={this.style}></div>
   }
 }
-
+const BlocksTemplate = ()=>[
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0],
+  [0, 0, 0, 0]
+]
 class CreateBlockStructure extends React.Component {
   constructor (props) {
     super()
-    const Blocks = [
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0],
-      [0, 0, 0, 0]
-    ]
+    
 
     this.style = { ...BlockDefault_styles, ...props.style }
+
+    let Blocks = BlocksTemplate()
 
     props.positions.forEach(index => {
       Blocks[index[0]][index[1]] = new Block(`${index[0]}${index[1]}`)
@@ -44,23 +44,41 @@ class CreateBlockStructure extends React.Component {
     this.state = {
       x_axis: props.x_axis,
       y_axis: props.y_axis,
-      
     }
     this.run = props.run
-    if (this.run) {
-      this.timer = setInterval(this.stepDown, 500)
-    }
-
   }
+  componentDidMount(){
+    if (this.run) {
+
+      this.timer = setInterval(this.stepDown, 100)
+
+    }
+  }
+  shouldComponentUpdate(nextProp,nextState){
+    if(nextState.x_axis === this.state.x_axis && nextState.y_axis === this.state.y_axis){
+      return false
+    }
+    return true
+  }
+  
   stepDown = () => {
 
     if ((this.state.y_axis >= axis_props.Max_y_axis)||(this.props.shouldRun(this))){
+      this.props.inActivate(this)
       clearInterval(this.timer)
       return
     }
     this.setState(prevState => {
       return { y_axis: prevState.y_axis + BLOCK_INCREMENT }
     })
+  }
+  resetPosition(newPosition){
+    let Blocks = BlocksTemplate()
+    newPosition.forEach(index => {
+      Blocks[index[0]][index[1]] = new Block(`${index[0]}${index[1]}`)
+    })
+    this.structure = Blocks
+    this.forceUpdate(() => {console.log("forced update")})
   }
   resetValues () {
     this.x_increment = 0
@@ -70,6 +88,17 @@ class CreateBlockStructure extends React.Component {
     this.x_increment = 0
     this.y_increment += BLOCK_INCREMENT
   }
+  moveBlockLeft(by){
+    this.setState((prevState)=> {
+      return {x_axis: prevState.x_axis - by}
+    })
+  }
+  moveBlockRight(by){
+    this.setState((prevState)=> {
+      return {x_axis: prevState.x_axis + by}
+    })
+  }
+
   applyBlock (block) {
     let block_component
     if (block) {
@@ -84,6 +113,7 @@ class CreateBlockStructure extends React.Component {
     this.x_increment += BLOCK_INCREMENT
     return block_component
   }
+  
   render () {
     this.resetValues()
     return (

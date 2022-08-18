@@ -28,9 +28,9 @@ const Z_Blocks = [
 const I_Blocks = [
   [
     [0, 0],
-    [0, 1],
-    [0, 2],
-    [0, 3]
+    [1, 0],
+    [2, 0],
+    [3, 0]
   ],
   [
     [3, 0],
@@ -74,10 +74,17 @@ const O_Blocks = [
   ]
 ]
 const Bonus_Blocks = [[[3, 0]]]
+const allBlocksCategories = [
+  Z_Blocks,
+  I_Blocks,
+  T_Blocks,
+  [...O_Blocks, ...Bonus_Blocks]
+]
+
 let randomInt = range => Math.ceil(Math.random() * range)
 function generateBlockPositions () {
-  const Blocks = [Z_Blocks, I_Blocks, T_Blocks, [...O_Blocks, ...Bonus_Blocks]]
-  const randomChoice = Blocks[randomInt(Blocks.length - 1)]
+  const randomChoice =
+    allBlocksCategories[randomInt(allBlocksCategories.length - 1)]
   const randomBlock = randomChoice[randomInt(randomChoice.length - 1)]
   return randomBlock
 }
@@ -89,8 +96,126 @@ class App extends React.Component {
       allBlocks: [],
       allBlockClass: []
     }
-    setInterval(this.newBlock, 5000)
+
+    setTimeout(this.newBlock, 3000)
   }
+
+  componentDidMount () {
+    document.addEventListener('keyup', e => this.userInput(e))
+  }
+  moveRight = () => {
+    let stop = false
+    this.setState(
+      prevState => {
+        if (!stop) {
+          const old_state = Object.assign([], prevState.allBlocks)
+          let newBlocksClass = prevState.allBlockClass
+          const new_state = old_state.map((blockData, index) => {
+            if (blockData.active) {
+              blockData.x_axis += BLOCK_INCREMENT
+              if (!(index > this.state.allBlockClass.length - 1)) {
+                newBlocksClass[index].moveBlockRight(BLOCK_INCREMENT)
+              }
+            }
+            return blockData
+          })
+
+          return { allBlocks: new_state, allBlockClass: newBlocksClass }
+        }
+      },
+      () => {
+        stop = true
+      }
+    )
+  }
+
+  moveLeft = () => {
+    let stop = false
+    this.setState(
+      prevState => {
+        if (!stop) {
+          const old_state = prevState.allBlocks
+          let newBlocksClass = prevState.allBlockClass
+          const newBlockState = old_state.map((blockData, index) => {
+            if (blockData.active) {
+              blockData.x_axis -= BLOCK_INCREMENT
+              if (!(index > this.state.allBlockClass.length - 1)) {
+                newBlocksClass[index].moveBlockLeft(BLOCK_INCREMENT)
+              }
+            }
+            return blockData
+          })
+
+          return { allBlocks: newBlockState, allBlockClass: newBlocksClass }
+        }
+      },
+      () => {
+        stop = true
+      }
+    )
+  }
+  changeStructure = direction => {
+    let stop = false
+    this.setState(prevState => {
+      if (!stop) {
+        let newBlocksClass = prevState.allBlockClass
+        const newBlockState = prevState.allBlocks.map((blockData, index) => {
+          if (blockData.active) {
+            let positionCategory = allBlocksCategories.find(blockPositions => {
+              return blockPositions.find(
+                position => position === blockData.positions
+              )
+            })
+            let positionIndex = positionCategory.indexOf(blockData.positions)
+            let new_positions;
+            if (direction === 'right') {
+              new_positions =
+                positionIndex + 1 === positionCategory.length
+                  ? positionCategory[0]
+                  : positionCategory[positionIndex + 1]
+            } else if (direction === 'left') {
+              new_positions =
+                positionIndex  === 0
+                  ? positionCategory[positionCategory.length-1]
+                  : positionCategory[positionIndex - 1]
+            }
+            console.log("my new position ", new_positions)
+            prevState.allBlockClass[index].resetPosition(new_positions)
+            blockData.positions = new_positions
+          }
+          return blockData
+        })
+        return { allBlocks: newBlockState, allBlockClass: newBlocksClass }
+      }
+    })
+  }
+  userInput = e => {
+
+    switch (e.key) {
+      case 'ArrowLeft': {
+        this.moveLeft()
+        break
+      }
+      case 'ArrowRight': {
+        this.moveRight()
+        break
+      }
+
+      case 'ArrowUp': {
+        this.changeStructure("right")
+        break
+      }
+      case 'ArrowDown': {
+        this.changeStructure("left")
+        break
+      }
+      default: {
+        console.log("Move only with the arrow keys")
+      }
+    }
+
+  }
+
   addBlockStructure = (blockStructure, id) => {
     this.setState(prevState => {
       prevState.allBlockClass[id] = blockStructure
@@ -99,10 +224,12 @@ class App extends React.Component {
   }
   newBlock = () => {
     let positions = generateBlockPositions()
-    const blockData = { positions: positions, active: false }
-    // const blockStructure = (
-    //
-    // )
+    const blockData = {
+      positions: positions,
+      active: true,
+      x_axis: axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3),
+      y_axis: axis_props.Min_y_axis + BLOCK_INCREMENT
+    }
     this.setState(prevState => {
       let new_state = [...prevState.allBlocks]
       new_state.push(blockData)
@@ -157,7 +284,19 @@ class App extends React.Component {
       })
     })
   }
-  
+
+  inActivate = blockStructure => {
+    const index = blockStructure.props.id
+    this.setState(prevState => {
+
+      let new_state = prevState.allBlocks
+      new_state[index].active = false
+      return { allBlocks: new_state }
+    })
+    this.newBlock()
+
+  }
+
   resetValues = () => {
     this.numberOfBlocks = 0
   }
@@ -169,17 +308,20 @@ class App extends React.Component {
           this.numberOfBlock++
           return (
             <CreateBlockStructure
-              x_axis={axis_props.Min_x_axis + BLOCK_INCREMENT * randomInt(3)}
-              y_axis={axis_props.Min_y_axis + BLOCK_INCREMENT}
+              x_axis={blockData.x_axis}
+              y_axis={blockData.y_axis}
               positions={blockData.positions}
               key={index}
               id={index}
-              run={true}
+              run={blockData.active}
               shouldRun={this.shouldRun}
+              inActivate={this.inActivate}
               addBlockStructure={this.addBlockStructure}
             />
           )
         })}
+        <button onClick={this.moveLeft}>Move left</button>
+        <button onClick={this.moveLeft}>Move Right</button>
       </div>
     )
   }
