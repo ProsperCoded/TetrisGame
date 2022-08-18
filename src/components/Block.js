@@ -1,6 +1,5 @@
-import React, { Component, useState } from 'react'
+import React from "react"
 import { axis_props } from '../App.js'
-
 let BlockDefault_styles = {
   padding: '5px',
   backgroundColor: 'black',
@@ -33,7 +32,7 @@ class CreateBlockStructure extends React.Component {
     ]
 
     this.style = { ...BlockDefault_styles, ...props.style }
-
+    
     props.positions.forEach(index => {
       Blocks[index[0]][index[1]] = new Block(`${index[0]}${index[1]}`)
     })
@@ -48,10 +47,11 @@ class CreateBlockStructure extends React.Component {
     }
     this.run = props.run
     if (this.run) {
-      this.timer = setInterval(this.stepDown, 500)
+      this.timer = setInterval(this.stepDown, 1000)
     }
 
   }
+  
   stepDown = () => {
 
     if ((this.state.y_axis >= axis_props.Max_y_axis)||(this.props.shouldRun(this))){
@@ -69,6 +69,16 @@ class CreateBlockStructure extends React.Component {
   newLine () {
     this.x_increment = 0
     this.y_increment += BLOCK_INCREMENT
+  }
+  moveLeft(by){
+    this.setState((prevState)=> {
+      return {x_axis: prevState.x_axis - by}
+    })
+  }
+  moveRight(by){
+    this.setState((prevState)=> {
+      return {x_axis: prevState.x_axis + by}
+    })
   }
   applyBlock (block) {
     let block_component
