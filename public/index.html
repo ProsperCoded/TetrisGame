@@ -1,43 +1,134 @@
-<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#000000" />
+        <link rel="stylesheet" href="../src/components/bootstrap.min.css" />
+    </head>
+    <body class="text-dark">
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="startGame">
+            <div class="display-3">Select Level</div>
+            <div class="levelButton d-flex flex-column">
+                <button class="btn">
+                    <h4 class="p-lg-5" id="easy-button">Easy</h4>
+                </button>
+                <button class="btn">
+                    <h4 class="p-lg-5" id="medium-button">Medium</h4>
+                </button>
+                <button class="btn">
+                    <h4 class="p-lg-5" id="hard-button">Hard</h4>
+                </button>
+            </div>
+        </div>
+        <div class="card border-1 shadow" id="Status-table">
+            <div class="list-group p-3 mt-2 mb-2 d-flex stretch">
+                <div class="list-item">
+                    <button id="newGame-button">New game</button>
+                </div>
+                <div class="list-item">
+                    <button id="pause-button">Pause</button>
+                </div>
+                <div class="list-item">
+                    <button id="quit-button">Quit</button>
+                </div>
+            </div>
+            <hr />
+            <div class="d-flex flex-column details">
+                <div class="d-flex justify-content-between">
+                    <h4>Level :</h4>
+                    <h4 id="level">None</h4>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <h4>Lines :</h4>
+                    <h4 id="lines">0</h4>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <h4>Score :</h4>
+                    <h4 id="score">0</h4>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <h4>Time :</h4>
+                    <h4 id="time"></h4>
+                </div>
+            </div>
+        </div>
+        <div id="body_container">
+            <div id="root" class="d-none"></div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        document.addEventListener("DOMContentLoaded", () => {
+            const buttons = ["easy", "medium", "hard"];
+            let GameTemplate ;
+            let backgroundImage = "components/200w.gif";
+            let currentLevel;
+            function StartGame(level) {
+                let root_node = document
+                    .querySelector("#body_container")
+                    .firstElementChild;
+                let start_button = root_node.querySelector(
+                    `#startApp-button-${level}`
+                );
+                if(!GameTemplate)GameTemplate = root_node.cloneNode(true);
+                console.log("Starting app....");
+                let start_message = root_node.querySelector("#start-message");
+                start_message.style.display = "block";
+                start_message.style.animationPlayState = "running";
+                start_button.click();
+                root_node.setAttribute("class", "d-flex");
+                document.querySelector(
+                    "#body_container"
+                ).style.backgroundImage = "none";
+                document.querySelector("#startGame").style.display = "none";
+                let status_table = document.querySelector("#Status-table");
+                status_table.style.display = "block";
+                status_table.style.animationPlayState = "running";
+                document.querySelector("#level").textContent =
+                    level.toUpperCase();
+                document.querySelector("#time").textContent  = "00:00:00"
+                document.querySelector("#lines").textContent = "0"
+                document.querySelector("#score").textContent = "0"
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+                setTimeout(() => {
+                    start_message.style.display = "none";
+                }, 3000);
+            }
+            function reset(){
+              let container = document.querySelector("#body_container")
+              let app = container.querySelector("#root")
+              container.removeChild(app)
+              app.remove()
+              delete app
+              let new_app = GameTemplate.cloneNode(true)
+              container.appendChild(new_app)
+            }
+            buttons.forEach((button_label) => {
+                let button = document.querySelector(`#${button_label}-button`);
+                button.addEventListener("click", () => {
+                    currentLevel = button_label
+                    StartGame(button_label);
+                });
+            });
+            document.querySelector("#newGame-button").addEventListener("click", () => {
+              reset()
+              StartGame(currentLevel)
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
-
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+            })
+            document.querySelector("#pause-button").addEventListener("click", ()=> {
+              document.querySelector("#pause-app").click()
+            })
+            document.querySelector("#quit-button").addEventListener("click", () => {
+              reset()
+              let status_table = document.querySelector("#Status-table")
+              // status_table.style.animationFillMode = "backwards"
+              // status_table.style.animationPlayState  = "running"
+              status_table.style.display = "none"
+              document.querySelector(
+                    "#body_container"
+                ).style.backgroundImage = backgroundImage;
+                document.querySelector("#startGame").style.display = "flex";
+            })
+        });
+    </script>
 </html>

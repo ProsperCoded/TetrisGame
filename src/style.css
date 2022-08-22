@@ -1,0 +1,114 @@
+html{
+  width:100%;
+  height: 100%;
+}
+.myBody{
+  border:solid  rgb(127, 255, 223) 10px;
+  background-color: rgb(15, 15, 15);
+}
+#body_container{
+  top:10px;
+  left:40%;
+  position:absolute;
+  width:50%;
+  height:70%;
+  background-image:url("components/200w.gif");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+body{
+  display:flex;
+  justify-content: left;
+  background-color: rgb(252, 252, 252);
+  background-image: url("components/images (6).jpeg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  text-decoration-color:black;
+  width:100%;
+  height: 100%;
+}
+@keyframes status_bar_entrance{
+  0%{
+    display:none;
+    height: 0%;
+    background-color: none;
+  }
+  100%{
+    display:flex;
+    height:100%;
+    background-color: rgb(128, 128, 128);
+  }
+}
+#Status-table{
+  display:none;
+  width:20%;
+  min-width:200px;
+  animation-name: status_bar_entrance;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  animation-play-state: paused;
+  
+}
+.levelButton button{
+  padding:3px;
+  margin:0px;
+  margin-bottom:5px;
+  background-color:rgba(184, 179, 179, 0.301);
+}
+@keyframes styleButton{
+  0%{
+    background-color:initial;
+    padding:initial;
+    border-bottom:groove 0px gray
+  }
+  100%{
+    background-color:rgba(184, 179, 179, 0.5);
+    padding:5px;
+    border-bottom:groove 5px gray
+  }
+}
+
+.levelButton button:hover{
+  animation-name: styleButton;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+@keyframes startMessage {
+  0%{
+    top:0%;
+    text-shadow:none;
+    box-shadow: none;
+  }
+  70%{
+    top:40%;
+    background-color: blue;
+    text-shadow: 4px 5px 15px;
+    box-shadow: 4px 5px 20px 9px blue;
+  }
+  100%{
+    background-color: none;
+    box-shadow: none;
+    top:20%;
+  }
+}
+#start-message{
+  display:none;
+  position:absolute;
+  padding:10px;
+  left:10%;
+  width:60%;
+  animation-name:startMessage;
+  animation-duration:2s;
+  animation-fill-mode:forwards;
+  animation-play-state: paused;
+}
+.details{
+  padding:5px;
+}
+.stretch{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  
+  justify-content: stretch;
+}
